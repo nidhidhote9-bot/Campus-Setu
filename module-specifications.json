@@ -1,0 +1,1069 @@
+{
+  "version": 2,
+  "scope": "complete-prototype",
+  "buildOrder": [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "22",
+    "21",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30",
+    "31",
+    "32",
+    "33",
+    "34",
+    "35",
+    "36"
+  ],
+  "modules": [
+    {
+      "id": "01",
+      "name": "Workspace, design system and application shell",
+      "origin": "Prototype foundation",
+      "deps": [],
+      "pages": [
+        "Public landing: product overview, module overview, sign-in and demo-mode disclosure.",
+        "Sign-in, session-expired, forbidden, not-found and recoverable-error pages.",
+        "Role-specific dashboard shells, global search, notifications drawer, profile menu and mobile navigation.",
+        "Component gallery: tables, filters, pagination, forms, date/time input, dialogs, timeline, charts, empty/loading/error states."
+      ],
+      "data": "Workspace packages, environment schema, navigation registry, route metadata, theme tokens and shared API contracts.",
+      "flow": "Create the fresh React/Express/MongoDB workspace; implement reusable UI and API infrastructure; route every persona into an authenticated shell.",
+      "rules": "Use original branding. All named pages must exist by their module gate. Do not ship dead menu entries or buttons that only show a success toast. Dates use an explicit campus timezone.",
+      "accept": "Production build and health/readiness work; nested routes refresh; shell is usable at 390, 768 and 1440 pixels; keyboard navigation and visible focus work.",
+      "demo": "Open landing, sign in and compare desktop/mobile shells.",
+      "key": "foundation",
+      "routes": [
+        "/app/foundation/landing",
+        "/app/foundation/authentication",
+        "/app/foundation/dashboard",
+        "/app/foundation/components"
+      ]
+    },
+    {
+      "id": "02",
+      "name": "Identity, role permissions and record scope",
+      "origin": "IUMS + challenge foundation",
+      "deps": [
+        "01"
+      ],
+      "pages": [
+        "Login and demo persona selector; password reset request and reset confirmation.",
+        "My profile, change password and active sessions.",
+        "User list/detail/create/edit; membership and role assignment; permission matrix.",
+        "Audit explorer filtered by actor, resource, institution and date."
+      ],
+      "data": "User, Membership, Role, Permission, Session, PasswordResetToken, AuditEvent. Roles: university_admin, institute_admin, admissions_officer, faculty, exam_controller, finance_officer, hostel_warden, transport_manager, librarian, hr_officer, helpdesk_agent, student and guardian.",
+      "flow": "Create account→assign institution membership→authenticate→select authorized scope→perform permitted operation→audit→logout or revoke session.",
+      "rules": "Hash passwords. Use Mongo-backed opaque sessions, secure cookies and CSRF protection. Scope comes from authenticated memberships. Demo persona selection authenticates a seeded account only in explicitly configured demo mode. Never create an unrestricted role switch.",
+      "accept": "Test unauthenticated, wrong role, wrong institute, wrong student and revoked session cases. Reset tokens expire and are single-use. DTOs exclude password/session secrets.",
+      "demo": "Switch between seeded student/faculty/staff accounts and demonstrate one denied access.",
+      "key": "identity",
+      "routes": [
+        "/app/identity/login",
+        "/app/identity/my-account",
+        "/app/identity/users",
+        "/app/identity/audit"
+      ]
+    },
+    {
+      "id": "03",
+      "name": "University organization, posts and configuration",
+      "origin": "IUMS + NLIU",
+      "deps": [
+        "02"
+      ],
+      "pages": [
+        "University profile and branding settings; campus/college hierarchy tree.",
+        "Institute, department, designation and post lists with create/edit/detail forms.",
+        "Staff-to-post assignments and delegated responsibility dates.",
+        "Academic year/session settings, numbering settings and module configuration."
+      ],
+      "data": "University, Institute, Department, Designation, Post, PostAssignment, AcademicSession, NumberSequence, TenantSettings.",
+      "flow": "Configure university→add institutes/departments→create posts→assign staff→configure scoped numbering and module settings.",
+      "rules": "Prevent hierarchy cycles and cross-university parents. Referenced masters are archived, not deleted. Branding and terminology are configuration, never username conditionals. Number sequences use atomic increments and unique indexes.",
+      "accept": "Two fictional universities cannot see each other's data; institutes within one university remain scoped; hierarchy cycles and duplicate active post assignments are rejected.",
+      "demo": "Change a university display label and show a scoped department/post assignment.",
+      "key": "organization",
+      "routes": [
+        "/app/organization/university",
+        "/app/organization/hierarchy",
+        "/app/organization/post-assignments",
+        "/app/organization/settings"
+      ]
+    },
+    {
+      "id": "04",
+      "name": "Versioned forms, localization and content configuration",
+      "origin": "IUMS",
+      "deps": [
+        "03"
+      ],
+      "pages": [
+        "Form builder list/editor/preview/publish/history.",
+        "Submission list/detail and validation errors.",
+        "English/Hindi label dictionary with missing-translation view.",
+        "Document template and FAQ/content editor with preview."
+      ],
+      "data": "FormDefinition, FormVersion, FormSubmission, TranslationEntry, ContentArticle, DocumentTemplateVersion.",
+      "flow": "Draft fields→preview→publish immutable schema version→submit data→review/export; revise by publishing a new version.",
+      "rules": "Allow only defined field types: text, number, date, select, multiselect, checkbox and attachment. Validation runs server-side. No arbitrary JavaScript/HTML execution. Existing submissions retain their version. English is fallback for missing Hindi labels.",
+      "accept": "Published schema cannot mutate existing submissions; unsafe markup is sanitized; required/conditional fields validate on both client and server; switching language preserves workflow state.",
+      "demo": "Publish a feedback form, submit it, then create a new version without changing the old response.",
+      "key": "forms",
+      "routes": [
+        "/app/forms/builder",
+        "/app/forms/submissions",
+        "/app/forms/translations",
+        "/app/forms/templates"
+      ]
+    },
+    {
+      "id": "05",
+      "name": "Academic masters and configurable curriculum",
+      "origin": "IUMS + NLIU",
+      "deps": [
+        "03"
+      ],
+      "pages": [
+        "Program, course, subject and term lists with detail/create/edit/archive.",
+        "Scheme version editor: components, weights, credits, passing rules and grading bands.",
+        "Elective groups, prerequisites and student subject registration.",
+        "Teaching assignment and faculty workload pages; syllabus upload/download."
+      ],
+      "data": "Program, Course, Subject, CurriculumVersion, AssessmentComponent, GradePolicy, ElectiveGroup, SubjectEnrollment, TeachingAssignment, SyllabusDocument.",
+      "flow": "Create program→version scheme→define subjects/components→publish curriculum→assign cohort→enroll subjects→assign faculty.",
+      "rules": "Model NLIU-style mid-semester, viva, project and attendance components as configuration. Published schemes are immutable. Validate maxima, minima, weight totals, grade boundaries and elective constraints; credit calculations use the assigned version.",
+      "accept": "Invalid weight totals, duplicate subjects and unmet prerequisites fail. A later curriculum revision does not alter an existing cohort. Faculty sees only assigned offerings.",
+      "demo": "Compare a law program's assessment scheme with a different program without code changes.",
+      "key": "academics",
+      "routes": [
+        "/app/academics/catalog",
+        "/app/academics/schemes",
+        "/app/academics/electives",
+        "/app/academics/teaching"
+      ]
+    },
+    {
+      "id": "06",
+      "name": "Admissions, import mapping and enrollment",
+      "origin": "IUMS",
+      "deps": [
+        "04",
+        "05"
+      ],
+      "pages": [
+        "Applicant registration, application wizard, documents, preview and status timeline.",
+        "Admissions dashboard, reviewer queue, application detail and correction/approval actions.",
+        "CSV import wizard: upload, external-code mapping, dry run, row errors and commit.",
+        "Registration/enrollment ID registry, transfer/withdrawal record and enrollment confirmation."
+      ],
+      "data": "Applicant, AdmissionApplication, AdmissionDocument, ImportBatch, ExternalCodeMapping, ReviewDecision, Enrollment, IdentifierSequence.",
+      "flow": "Draft→submitted→under_review→correction_required→resubmitted→approved→enrolled. Approval can also reject with reason. Mock admission-provider data enters the same staging pipeline.",
+      "rules": "Explicit document and fee prerequisites; simulate provider checks through adapters. Generate distinct registration/enrollment IDs atomically; use IURN/IUEN concepts without claiming official issuance. Duplicate detection offers review, never silent merging.",
+      "accept": "Invalid transitions and premature enrollment fail; dry run writes no applicants; import is idempotent; bad rows are downloadable; applicant can correct only requested fields; numbering survives concurrent approvals.",
+      "demo": "Import five candidates with one mapping error, fix it, request a correction, approve and enroll one candidate.",
+      "key": "admissions",
+      "routes": [
+        "/app/admissions/apply",
+        "/app/admissions/review",
+        "/app/admissions/imports",
+        "/app/admissions/enrollment"
+      ]
+    },
+    {
+      "id": "07",
+      "name": "Student lifecycle and unified record",
+      "origin": "Challenge + IUMS",
+      "deps": [
+        "05",
+        "06"
+      ],
+      "pages": [
+        "Student dashboard with live summaries, student directory and Student 360 detail.",
+        "Profile correction request, ID card preview/download and document locker.",
+        "Subject enrollment, progression, transfer, withdrawal and graduation status.",
+        "Alumni profile and service eligibility screen."
+      ],
+      "data": "StudentProfile, EnrollmentHistory, ProfileChangeRequest, StudentDocument, StudentStatusEvent, GraduationRecord, AlumniProfile.",
+      "flow": "Admission creates student→subject enrollment→term progression→graduation/alumni, with separate authorized transfer/withdrawal paths. Other modules attach facts to this record.",
+      "rules": "Student 360 composes scoped module data, not duplicate editable copies. Sensitive fields use explicit DTOs. Documents are private. Status changes preserve history and affect future eligibility without deleting records.",
+      "accept": "Student cannot approve their own profile correction; graduation requires configured checks; transfer preserves past results; document access respects ownership; dashboard numbers match source records.",
+      "demo": "Show the enrolled candidate as a student with academics, fees and request history in one profile.",
+      "key": "students",
+      "routes": [
+        "/app/students/overview",
+        "/app/students/profile",
+        "/app/students/lifecycle",
+        "/app/students/alumni"
+      ]
+    },
+    {
+      "id": "08",
+      "name": "Attendance and academic engagement",
+      "origin": "Challenge",
+      "deps": [
+        "05",
+        "07"
+      ],
+      "pages": [
+        "Faculty class roster, attendance capture and session history.",
+        "Attendance correction request/review and bulk upload preview.",
+        "Student course attendance detail, trend and shortage explanation.",
+        "Staff attendance analytics and downloadable scoped report."
+      ],
+      "data": "AttendanceSession, AttendanceEntry, AttendanceCorrection, AttendancePolicyVersion.",
+      "flow": "Create class session→mark attendance→submit→student sees summary→request correction→authorized review→audited update.",
+      "rules": "Explicit present/absent/excused states; denominator follows policy. Unique student/session pair. Faculty is restricted to teaching assignments. Bulk upload validates roster and dates before commit.",
+      "accept": "Duplicate entries cannot inflate totals; no-session percentage is not NaN; unassigned faculty denied; approved correction updates aggregates and preserves prior value.",
+      "demo": "Mark one absence, request correction, approve it and show the updated student percentage.",
+      "key": "attendance",
+      "routes": [
+        "/app/attendance/capture",
+        "/app/attendance/corrections",
+        "/app/attendance/my-attendance",
+        "/app/attendance/reports"
+      ]
+    },
+    {
+      "id": "09",
+      "name": "Timetable, rooms and academic calendar",
+      "origin": "Challenge + IUMS",
+      "deps": [
+        "05"
+      ],
+      "pages": [
+        "Weekly/day timetable for student, faculty and administrator.",
+        "Timetable editor, room list/capacity and conflict checker.",
+        "Substitution/reschedule workflow and affected-class notice preview.",
+        "Academic calendar, holidays, assessment dates and calendar export."
+      ],
+      "data": "Room, TimetableEntry, RecurrenceRule, TimetableException, CalendarEvent, Holiday.",
+      "flow": "Create recurring schedule→check faculty/room/cohort conflicts→publish→reschedule a dated instance→notify affected users.",
+      "rules": "Use campus timezone and date-specific exceptions. Check overlapping intervals, room capacity and faculty/cohort conflicts. Do not overwrite history when changing future schedules.",
+      "accept": "Reject conflicting schedule entries; a reschedule updates only intended dates; holidays remove or flag sessions according to policy; student schedule includes only enrolled courses.",
+      "demo": "Attempt a room collision, resolve it and show the student's changed next class.",
+      "key": "timetable",
+      "routes": [
+        "/app/timetable/calendar",
+        "/app/timetable/editor",
+        "/app/timetable/reschedule",
+        "/app/timetable/events"
+      ]
+    },
+    {
+      "id": "10",
+      "name": "Fees, payments, reconciliation and finance",
+      "origin": "Challenge + IUMS",
+      "deps": [
+        "07"
+      ],
+      "pages": [
+        "Fee head/category/rule configuration; concession and late-fee configuration.",
+        "Student invoices, checkout, payment attempts, receipts and refund status.",
+        "Finance dashboard, fund/budget register, cash/bank collection ledger, reconciliation queue and exception detail.",
+        "Scholarship/concession request review and finance export."
+      ],
+      "data": "FeeRuleVersion, Invoice, InvoiceLine, PaymentOrder, PaymentEvent, Receipt, Refund, Concession, ReconciliationRun. Fund, Budget, BudgetEntry with configurable heads and immutable approved entries.",
+      "flow": "Assess fees→issue invoice→create payment order→simulated provider callback→verify→settle→receipt; refund uses separate approval and provider event. Reconciliation compares ledger/provider events.",
+      "rules": "Integer paise; server-calculated amounts; unique idempotency keys; signed local simulator callbacks; amount/currency/order binding; atomic settlement and receipt creation. Delayed/duplicate/failed callbacks must be testable. No actual money moves.",
+      "accept": "Duplicate callbacks yield one settlement; tampered signature/amount rejected; success is not reversed by a late failure; partial refund cannot exceed paid balance; reports reconcile.",
+      "demo": "Pay one invoice, replay its callback, show one receipt, then reconcile a deliberately pending order.",
+      "key": "finance",
+      "routes": [
+        "/app/finance/rules",
+        "/app/finance/my-fees",
+        "/app/finance/reconciliation",
+        "/app/finance/concessions"
+      ]
+    },
+    {
+      "id": "11",
+      "name": "Exam applications, eligibility and hall tickets",
+      "origin": "IUMS",
+      "deps": [
+        "05",
+        "07",
+        "10"
+      ],
+      "pages": [
+        "Exam cycle/setup, regular/private/backlog policy and application windows.",
+        "Student exam application wizard, eligibility explanation, fee link and status.",
+        "Exam office review queue, exceptions and subject roster.",
+        "Roll-number assignment and hall ticket preview/download."
+      ],
+      "data": "ExamCycle, ExamPolicyVersion, ExamApplication, EligibilityDecision, ExamEnrollment, RollNumberAssignment, HallTicket.",
+      "flow": "Open cycle→calculate eligibility→student selects valid papers→pay required fee→review→approve→assign roll number→issue hall ticket.",
+      "rules": "Configurable attendance/academic/fee requirements. Exceptions need authorized reason. Private/backlog categories use explicit policy rather than guessed regulations. Roll numbering is a new prototype design because the manual does not fully specify it.",
+      "accept": "Closed windows, ineligible subjects and unpaid prerequisites block submission/approval appropriately; repeat issuance is idempotent; hall tickets never cross student boundaries.",
+      "demo": "Show an ineligible application, an audited exception and successful hall ticket issuance.",
+      "key": "exam-applications",
+      "routes": [
+        "/app/exam-applications/cycles",
+        "/app/exam-applications/apply",
+        "/app/exam-applications/review",
+        "/app/exam-applications/hall-tickets"
+      ]
+    },
+    {
+      "id": "12",
+      "name": "Exam scheduling, centers and materials",
+      "origin": "IUMS",
+      "deps": [
+        "11",
+        "09"
+      ],
+      "pages": [
+        "Exam timetable builder and conflict report.",
+        "Center/room verification, capacity and seating allocation.",
+        "Invigilator duty roster, appointment and acknowledgement.",
+        "Answer-book stock/serial ranges, dispatch, receipt, usage and return register."
+      ],
+      "data": "ExamSchedule, ExamCenter, CenterVerification, SeatingAllocation, InvigilationDuty, MaterialBatch, MaterialMovement.",
+      "flow": "Verify center→publish schedule→allocate seats→assign invigilators→dispatch numbered materials→acknowledge/return→reconcile.",
+      "rules": "No student/paper/time collisions or capacity overrun. Serial intervals cannot overlap. Reallocation retains an audit record. Confidential metadata is restricted to exam staff.",
+      "accept": "Allocation respects capacity under concurrent actions; duplicate serial range rejected; absent acknowledgement is visible; usage plus remaining/returned quantities reconciles.",
+      "demo": "Allocate an exam room, reject an over-capacity action and reconcile an answer-book batch.",
+      "key": "exam-operations",
+      "routes": [
+        "/app/exam-operations/schedule",
+        "/app/exam-operations/centers",
+        "/app/exam-operations/invigilators",
+        "/app/exam-operations/materials"
+      ]
+    },
+    {
+      "id": "13",
+      "name": "Paper setters and confidential question bank",
+      "origin": "IUMS",
+      "deps": [
+        "05",
+        "11"
+      ],
+      "pages": [
+        "Setter panel and appointment requests; acceptance/rejection with reason.",
+        "Secure paper upload, version list, review and approval.",
+        "Question bank by subject/topic/difficulty and draft paper assembly.",
+        "Controlled download/access audit and confidentiality settings."
+      ],
+      "data": "SetterAppointment, AppointmentResponse, Question, PaperVersion, PaperReview, ConfidentialAccessEvent.",
+      "flow": "Invite internal seeded setter→accept→submit paper→review/revise→approve→authorized release.",
+      "rules": "Mock notification delivery; private storage and narrowly scoped access. Submitted versions immutable. Paper content never enters general search, guardian views or AI context. No public file URLs.",
+      "accept": "Non-appointed faculty and students cannot retrieve papers; version history preserved; release before approval fails; downloads are auditable.",
+      "demo": "Accept a setter appointment and approve a revised sample paper using authorized accounts.",
+      "key": "question-papers",
+      "routes": [
+        "/app/question-papers/appointments",
+        "/app/question-papers/papers",
+        "/app/question-papers/question-bank",
+        "/app/question-papers/access"
+      ]
+    },
+    {
+      "id": "14",
+      "name": "Marks entry, moderation and approval",
+      "origin": "IUMS + NLIU",
+      "deps": [
+        "05",
+        "11"
+      ],
+      "pages": [
+        "Faculty assessment roster and component-wise marks grid.",
+        "CSV marks import preview/errors and submission summary.",
+        "Moderator review, discrepancy queue and approval history.",
+        "Student published assessment breakdown; unpublished marks hidden."
+      ],
+      "data": "AssessmentBatch, MarkEntry, MarkImport, ModerationDecision, AssessmentApproval.",
+      "flow": "Draft marks→validate→faculty submits→moderator returns or approves→exam office locks assessment for results.",
+      "rules": "Use exact curriculum component version. Explicit absent/withheld states, no sentinel negative score. Validate maxima, missing entries and authorized correction reasons. Separation of submission and approval is configurable and demonstrated.",
+      "accept": "Out-of-range marks rejected; submitted batches not silently editable; wrong-term import cannot overwrite another term; returned batches preserve review comments.",
+      "demo": "Import a mark above maximum, fix it, submit, return for correction and approve.",
+      "key": "assessment",
+      "routes": [
+        "/app/assessment/marks",
+        "/app/assessment/imports",
+        "/app/assessment/moderation",
+        "/app/assessment/my-assessments"
+      ]
+    },
+    {
+      "id": "15",
+      "name": "Results, transcripts and academic progression",
+      "origin": "IUMS",
+      "deps": [
+        "14"
+      ],
+      "pages": [
+        "Tabulation preview, validation errors and result approval queue.",
+        "Publication dashboard and revision comparison.",
+        "Student result/grade card, transcript download and progression status.",
+        "Pass list, withheld list, summary and export."
+      ],
+      "data": "ResultRun, ResultRevision, SubjectResult, TermResult, PublicationEvent, TranscriptSnapshot.",
+      "flow": "Calculate draft from approved marks→validate→approve→publish immutable revision→student views result; correction creates superseding revision.",
+      "rules": "Document rounding, credit, grade and pass/backlog formulas. Never delete published results during recalculation. Term/university/student keys are explicit. Transcripts refer to effective published revisions.",
+      "accept": "Golden fixture grade calculations match expected values; duplicate publish does not duplicate records; correction changes only selected scope; unpublished results remain private.",
+      "demo": "Publish a term result, then compare an authorized revised version with its original.",
+      "key": "results",
+      "routes": [
+        "/app/results/tabulation",
+        "/app/results/publication",
+        "/app/results/my-results",
+        "/app/results/reports"
+      ]
+    },
+    {
+      "id": "16",
+      "name": "Revaluation and retotalling",
+      "origin": "IUMS",
+      "deps": [
+        "10",
+        "15"
+      ],
+      "pages": [
+        "Student eligible-paper list, revaluation/retotalling request and fee status.",
+        "Exam-office request queue, reviewer assignment and deadline tracking.",
+        "Reviewer outcome entry, approval and result revision link.",
+        "Student decision notice and before/after comparison."
+      ],
+      "data": "ReviewPolicy, ResultReviewRequest, ReviewAssignment, ReviewOutcome.",
+      "flow": "Published result→eligible request within window→fee settlement→review assignment→outcome approval→superseding result revision.",
+      "rules": "Retotalling and revaluation are separate procedures. Policy values are fictional configurable examples until official regulations are supplied. Review outcome cannot directly overwrite a published record.",
+      "accept": "Late/ineligible requests rejected; unpaid request not assigned; duplicate same-paper/type request controlled; changed result links to original and reason.",
+      "demo": "Submit retotalling, pay via simulator and publish its approved correction.",
+      "key": "revaluation",
+      "routes": [
+        "/app/revaluation/apply",
+        "/app/revaluation/assignments",
+        "/app/revaluation/outcomes",
+        "/app/revaluation/my-decisions"
+      ]
+    },
+    {
+      "id": "17",
+      "name": "Certificates and digital document verification",
+      "origin": "Challenge + IUMS",
+      "deps": [
+        "07",
+        "10",
+        "15"
+      ],
+      "pages": [
+        "Certificate catalog, eligibility checklist, request form and tracking.",
+        "Staff review/approval/issuance queue and template preview.",
+        "My certificates, download, sharing/verification link and revocation status.",
+        "Public QR verification page with minimal fields."
+      ],
+      "data": "CertificateType, CertificateRequest, IssuedCertificate, CertificateRevocation, VerificationToken.",
+      "flow": "Request→check prerequisites→review→approve→issue snapshot/PDF→verify; authorized revocation changes verification state without deleting issuance.",
+      "rules": "Mark all credentials DEMO. Random opaque verification tokens; private authenticated downloads; minimal public facts. Persist immutable snapshot and document hash. No claim of legally recognized signing or national integration.",
+      "accept": "Unapproved issuance blocked; retries produce same certificate; revoked document verifies as revoked; PDF data matches issued snapshot; other students cannot download it.",
+      "demo": "Issue a bonafide certificate, scan QR and then demonstrate revocation with a second sample.",
+      "key": "certificates",
+      "routes": [
+        "/app/certificates/catalog",
+        "/app/certificates/review",
+        "/app/certificates/my-certificates",
+        "/app/certificates/verify"
+      ]
+    },
+    {
+      "id": "18",
+      "name": "Student helpdesk, grievances and service desk",
+      "origin": "Challenge",
+      "deps": [
+        "02",
+        "07"
+      ],
+      "pages": [
+        "Student service catalog, ticket form with attachments and my tickets.",
+        "Ticket detail with public thread, status timeline and reopen action.",
+        "Staff inbox, assignment, priority, escalation and SLA views.",
+        "Knowledge base and service category configuration."
+      ],
+      "data": "Ticket, TicketMessage, TicketAssignment, ServiceCategory, SLAPolicy, EscalationEvent.",
+      "flow": "Open→triage→assign→in_progress→resolved→student closes or reopens; overdue tickets surface in escalation queue.",
+      "rules": "Internal notes are separate from public messages. Sensitive grievances have restricted staff membership. Attachment policies apply. Simulated time advancement may trigger demo escalation but must be labelled.",
+      "accept": "Unrelated students/staff cannot access restricted tickets; reopen retains history; SLA computation follows configured working hours; public DTO excludes internal notes.",
+      "demo": "Raise a hostel issue, add an internal note, resolve and reopen it from student account.",
+      "key": "helpdesk",
+      "routes": [
+        "/app/helpdesk/my-tickets",
+        "/app/helpdesk/ticket-detail",
+        "/app/helpdesk/staff-inbox",
+        "/app/helpdesk/knowledge"
+      ]
+    },
+    {
+      "id": "19",
+      "name": "Hostel operations",
+      "origin": "Challenge",
+      "deps": [
+        "07",
+        "10"
+      ],
+      "pages": [
+        "Hostel/building/room/bed inventory and occupancy map.",
+        "Student application, preferences, eligibility and waitlist position.",
+        "Warden review, allocation, room transfer, check-in/out and clearance.",
+        "Hostel charges, complaints and occupancy/dues reports."
+      ],
+      "data": "Hostel, HostelRoom, Bed, HostelApplication, BedAllocation, WaitlistEntry, HostelMovement, HostelClearance.",
+      "flow": "Apply→review→allocate or waitlist→pay deposit→check in→transfer or check out→clear dues→release bed.",
+      "rules": "Use unique active-bed and active-student allocation constraints with transactions. Define gender/accessibility/preferences as configured eligibility rules, not guessed institutional policy. No capacity overrun or duplicate occupancy.",
+      "accept": "Concurrent requests for final bed yield only one allocation; checkout releases bed; transfer cannot occupy two beds permanently; fees and complaints link to existing modules.",
+      "demo": "Fill last bed, waitlist another student, check out occupant and allocate the released bed.",
+      "key": "hostel",
+      "routes": [
+        "/app/hostel/inventory",
+        "/app/hostel/apply",
+        "/app/hostel/allocations",
+        "/app/hostel/reports"
+      ]
+    },
+    {
+      "id": "20",
+      "name": "Transport operations",
+      "origin": "Challenge",
+      "deps": [
+        "07",
+        "10"
+      ],
+      "pages": [
+        "Routes/stops, vehicles, capacity, drivers and service calendar.",
+        "Student route subscription, pass, renewal and cancellation.",
+        "Transport manager allocation/waitlist, vehicle substitution and trip log.",
+        "Map or route schematic, simulated vehicle position and utilization reports."
+      ],
+      "data": "TransportRoute, Stop, Vehicle, DriverAssignment, TransportSubscription, SeatAllocation, TransportPass, Trip, SimulatedLocation.",
+      "flow": "Choose route/stop→approve seat→pay→issue pass→record trip→renew/cancel; substitute vehicle with capacity checks.",
+      "rules": "No real GPS is required: label deterministic location playback as simulation. Capacity is defined per service/time slot. Store exact route/pass validity dates. Reuse fee records.",
+      "accept": "Cannot overbook final seat; expired pass marked invalid; cancellation releases capacity; smaller replacement vehicle surfaces a conflict; simulation never claims live tracking.",
+      "demo": "Allocate a pass, show the route and play a labelled simulated trip.",
+      "key": "transport",
+      "routes": [
+        "/app/transport/routes",
+        "/app/transport/my-pass",
+        "/app/transport/operations",
+        "/app/transport/tracking"
+      ]
+    },
+    {
+      "id": "21",
+      "name": "Parent and guardian portal",
+      "origin": "Challenge",
+      "deps": [
+        "07",
+        "08",
+        "10",
+        "15",
+        "22"
+      ],
+      "pages": [
+        "Guardian invitation/link verification and consent/authority record.",
+        "Guardian dashboard and linked-student switcher.",
+        "Permitted attendance, fee, published-result and notice views.",
+        "Access preferences, contact update request and relationship revocation."
+      ],
+      "data": "GuardianLink, GuardianPermissionGrant, GuardianInvitation, GuardianAccessEvent.",
+      "flow": "Authorized invitation→simulated verification→student/institution approval under configured policy→limited access→revoke.",
+      "rules": "Guardian gets a separate account, never the student's session. Access categories are explicit. University students may be adults; use a configurable consent/authority process and do not assume automatic parental access. No private grievances or unpublished results.",
+      "accept": "Unlinked student IDs denied; revoked relationship stops next request; removing result permission hides API data, not only UI; invitation expires.",
+      "demo": "Show attendance as guardian, deny a private ticket and revoke the link.",
+      "key": "guardians",
+      "routes": [
+        "/app/guardians/linking",
+        "/app/guardians/dashboard",
+        "/app/guardians/student-summary",
+        "/app/guardians/permissions"
+      ]
+    },
+    {
+      "id": "22",
+      "name": "Notices, notifications and calendar communication",
+      "origin": "IUMS + cross-module",
+      "deps": [
+        "03",
+        "04"
+      ],
+      "pages": [
+        "Notice compose/preview, audience selection, scheduling and publication.",
+        "Personal notification center, read/unread and preferences.",
+        "Delivery outbox, retry, failure details and simulated provider inbox.",
+        "Academic/event calendar subscription and document attachments."
+      ],
+      "data": "Notice, NoticeAudience, Notification, NotificationPreference, OutboxMessage, DeliveryAttempt.",
+      "flow": "Domain action creates outbox event→delivery worker dispatches through simulator→recipient sees notification→delivery status recorded.",
+      "rules": "Idempotent event handling prevents duplicate delivery. Match audience from authorized membership/enrollment. Simulator stores messages locally and sends no real SMS/email. Preview audience size and content.",
+      "accept": "Failed delivery retries without duplicate in-app notice; wrong institute excluded; scheduled notice respects campus timezone; sensitive event details absent from broad notifications.",
+      "demo": "Publish a class notice and inspect one successful and one retried simulated delivery.",
+      "key": "communications",
+      "routes": [
+        "/app/communications/notices",
+        "/app/communications/inbox",
+        "/app/communications/outbox",
+        "/app/communications/calendar"
+      ]
+    },
+    {
+      "id": "23",
+      "name": "Committees, tasks and notesheets",
+      "origin": "IUMS",
+      "deps": [
+        "03",
+        "22"
+      ],
+      "pages": [
+        "Committee list, member tenure, meeting agenda and decisions.",
+        "Task board/list/detail with assignee, due date and priority.",
+        "Notesheet compose, attachments, forwarding, review and decision timeline.",
+        "My pending approvals and overdue-work dashboard."
+      ],
+      "data": "Committee, CommitteeMembership, Meeting, CommitteeDecision, Task, Notesheet, NotesheetStep.",
+      "flow": "Create notesheet→assign/forward→review with remarks→approve/reject/return→complete; committee decision may create tasks.",
+      "rules": "Only current authorized assignee can act. Forwarding target must have valid institutional responsibility. Preserve remarks/attachments/history. Prevent self-approval when the selected policy requires separation.",
+      "accept": "Former committee member denied; forwarding records prior owner; concurrent decisions do not both win; completed notesheet remains auditable.",
+      "demo": "Forward a purchase notesheet through two staff roles and show its decision timeline.",
+      "key": "governance",
+      "routes": [
+        "/app/governance/committees",
+        "/app/governance/tasks",
+        "/app/governance/notesheets",
+        "/app/governance/approvals"
+      ]
+    },
+    {
+      "id": "24",
+      "name": "E-register and document movement",
+      "origin": "IUMS + NLIU",
+      "deps": [
+        "03",
+        "23"
+      ],
+      "pages": [
+        "Inward/outward register lists, create entry and document detail.",
+        "Number format/sequence configuration and printable acknowledgement.",
+        "Document dispatch, recipient acknowledgement and movement history.",
+        "Search, date/type filters and authorized export."
+      ],
+      "data": "RegisterType, RegisterEntry, RegisterSequence, DocumentMovement, DispatchAcknowledgement.",
+      "flow": "Register document→assign unique scoped number→route→acknowledge→dispatch/archive.",
+      "rules": "Atomic university/institute/year/type numbering. No mutable reused numbers; void with reason instead. Attachments private and exports scoped. Department labels/number prefixes configurable.",
+      "accept": "Concurrent entries remain unique; wrong-year format rejected; void history visible; private attachment not downloadable by unrelated users.",
+      "demo": "Register a document, move it to another department and acknowledge it.",
+      "key": "registers",
+      "routes": [
+        "/app/registers/entries",
+        "/app/registers/numbering",
+        "/app/registers/movement",
+        "/app/registers/reports"
+      ]
+    },
+    {
+      "id": "25",
+      "name": "Staff establishment and leave",
+      "origin": "Broader IUMS vision; prototype workflow specified here",
+      "deps": [
+        "03",
+        "22"
+      ],
+      "pages": [
+        "Employee directory/detail, appointment/post history and service documents.",
+        "Leave policies, balances, application and personal calendar.",
+        "Manager approval queue, delegation and team absence calendar.",
+        "Vacancy, retirement/pension-case and establishment-case registers."
+      ],
+      "data": "Employee, Appointment, ServiceEvent, LeavePolicy, LeaveBalance, LeaveRequest, EstablishmentCase.",
+      "flow": "Create staff record→assign post→accrue demo leave balance→apply→approve/reject→update balance; track establishment cases separately.",
+      "rules": "Use fictional policies. Approved leave affects availability; prevents overlapping approved leave. Pension cases are tracked, not legally calculated. Sensitive staff documents restricted to HR.",
+      "accept": "Insufficient balance and overlapping requests rejected; cancellation restores correct balance once; employee cannot approve own leave; vacancy counts derive from active posts.",
+      "demo": "Approve leave and show balance/calendar change and one establishment-case timeline.",
+      "key": "hr",
+      "routes": [
+        "/app/hr/employees",
+        "/app/hr/my-leave",
+        "/app/hr/approvals",
+        "/app/hr/establishment"
+      ]
+    },
+    {
+      "id": "26",
+      "name": "Payroll and expenditure prototype",
+      "origin": "Broader manual vision; proposed prototype detail",
+      "deps": [
+        "25",
+        "10"
+      ],
+      "pages": [
+        "Salary component/structure editor and effective-date assignments.",
+        "Monthly payroll draft, validation, approval and simulated disbursement.",
+        "Employee payslip and payroll history.",
+        "Expense claim, attachment, approval and reimbursement status."
+      ],
+      "data": "SalaryStructureVersion, EmployeeSalaryAssignment, PayrollRun, Payslip, DisbursementEvent, ExpenseClaim.",
+      "flow": "Configure fictional salary→generate monthly draft→validate→approve→simulate disbursement→issue DEMO payslip; claims follow approval→simulated reimbursement.",
+      "rules": "Integer paise, documented demo formulas, immutable approved runs, no real tax/statutory compliance claims. Prevent duplicate employee/month runs and double disbursement. Corrections use adjustment records.",
+      "accept": "Golden salary fixture totals match; duplicate payroll blocked; wrong employee cannot view payslip; rejected claim never enters disbursement.",
+      "demo": "Generate and approve one payroll run, simulate payment and download a DEMO payslip.",
+      "key": "payroll",
+      "routes": [
+        "/app/payroll/structures",
+        "/app/payroll/runs",
+        "/app/payroll/my-payslips",
+        "/app/payroll/claims"
+      ]
+    },
+    {
+      "id": "27",
+      "name": "Library services",
+      "origin": "Broader IUMS vision; proposed prototype detail",
+      "deps": [
+        "07",
+        "10"
+      ],
+      "pages": [
+        "Searchable catalog, book detail and availability.",
+        "Catalog/accession management and borrower membership.",
+        "Issue/return/renew counter, reservations and waiting queue.",
+        "Student loans, due dates, fines and library clearance."
+      ],
+      "data": "BookTitle, BookCopy, LibraryMembership, Loan, Reservation, LibraryFinePolicy, LibraryClearance.",
+      "flow": "Catalog copy→reserve/issue→renew or return→calculate demo overdue charge→settle linked invoice→clearance.",
+      "rules": "One active loan per copy; borrowing/renewal policies configurable. Fine computation reproducible from dates and policy version. No separate duplicate payment ledger.",
+      "accept": "Concurrent issue for one copy gives one winner; reserved copy respects queue; return idempotent; overdue charge capped/configured; graduation clearance reflects outstanding loans.",
+      "demo": "Issue a book, use a labelled simulated date to show an overdue return and resolve clearance.",
+      "key": "library",
+      "routes": [
+        "/app/library/catalog",
+        "/app/library/accessions",
+        "/app/library/circulation",
+        "/app/library/my-library"
+      ]
+    },
+    {
+      "id": "28",
+      "name": "Inventory, procurement and assets",
+      "origin": "Manual stock section incomplete; proposed prototype workflow",
+      "deps": [
+        "23",
+        "24",
+        "10"
+      ],
+      "pages": [
+        "Item/category/vendor masters, stock ledger and low-stock view.",
+        "Requisition, approval, purchase order and goods receipt.",
+        "Issue/return, department transfer and asset assignment.",
+        "Stock count, adjustment approval and maintenance history."
+      ],
+      "data": "InventoryItem, Vendor, Requisition, PurchaseOrder, GoodsReceipt, StockMovement, Asset, StockAdjustment.",
+      "flow": "Requisition→approval→purchase order→receive→issue/assign→return/transfer→audit count→approved adjustment.",
+      "rules": "Do not claim the legacy manual specified this flow. Inventory changes use immutable movements and nonnegative balance checks. No real purchase emails/orders are sent. Serial-numbered assets are unique.",
+      "accept": "Issue beyond stock rejected; repeated receipt does not double stock; transfer balances reconcile; only authorized staff approve adjustments.",
+      "demo": "Receive five items, issue two and reconcile the balance with movement history.",
+      "key": "inventory",
+      "routes": [
+        "/app/inventory/masters",
+        "/app/inventory/procurement",
+        "/app/inventory/movements",
+        "/app/inventory/assets"
+      ]
+    },
+    {
+      "id": "29",
+      "name": "Research, accreditation, establishment and finance MIS",
+      "origin": "IUMS MIS",
+      "deps": [
+        "07",
+        "10",
+        "15",
+        "25",
+        "28"
+      ],
+      "pages": [
+        "Leadership dashboard with drill-down and filters.",
+        "Research publications, projects, PhD records and patents.",
+        "Accreditation/activity evidence register and reporting-period snapshots.",
+        "Enrollment/results/staffing/vacancy/finance/student-welfare reports and export builder."
+      ],
+      "data": "ResearchPublication, ResearchProject, PhDRecord, PatentRecord, AccreditationEvidence, ReportingPeriod, ReportSnapshot.",
+      "flow": "Authorized data entry→verification→period aggregation→preview report→publish snapshot/export.",
+      "rules": "Operational metrics derive from source modules. Research/accreditation entries are synthetic and labelled. Every metric has a formula, scope and period. No fabricated institutional ranking or claimed compliance.",
+      "accept": "Dashboard totals reconcile to filtered source records; restricted dimensions cannot be exported; CSV formula injection neutralized; snapshot remains stable after later data changes.",
+      "demo": "Filter one institute's enrollment/collections, drill to records and export a period snapshot.",
+      "key": "mis",
+      "routes": [
+        "/app/mis/dashboard",
+        "/app/mis/research",
+        "/app/mis/accreditation",
+        "/app/mis/reports"
+      ]
+    },
+    {
+      "id": "30",
+      "name": "Feedback and surveys",
+      "origin": "IUMS",
+      "deps": [
+        "04",
+        "05",
+        "22"
+      ],
+      "pages": [
+        "Survey builder/templates, audience and schedule.",
+        "Student/faculty response form and completion history.",
+        "Response dashboard, topic summaries and authorized export.",
+        "Action items linked to survey outcomes."
+      ],
+      "data": "Survey, SurveyAudience, SurveyResponse, SurveyAggregate, SurveyAction.",
+      "flow": "Publish versioned survey→notify audience→collect response→close→aggregate→assign improvement task.",
+      "rules": "Choose identified or anonymous mode at creation; explain limits. Anonymous results use a minimum response threshold and restricted linkage, not a false promise of perfect anonymity. One response per invitation, with token handling appropriate to mode.",
+      "accept": "Non-audience response denied; duplicate token rejected; results suppressed below configured threshold; published questions immutable.",
+      "demo": "Collect seeded course feedback and create one improvement task from its aggregate.",
+      "key": "feedback",
+      "routes": [
+        "/app/feedback/surveys",
+        "/app/feedback/respond",
+        "/app/feedback/analytics",
+        "/app/feedback/actions"
+      ]
+    },
+    {
+      "id": "31",
+      "name": "AI chat assistant and voice interface",
+      "origin": "Challenge",
+      "deps": [
+        "07",
+        "08",
+        "09",
+        "10",
+        "17",
+        "18",
+        "19",
+        "20",
+        "22"
+      ],
+      "pages": [
+        "Assistant full page and contextual drawer.",
+        "Conversation history controls, source cards and linked records.",
+        "Voice input/output controls, transcript and microphone error/fallback.",
+        "Admin knowledge articles, source versions and AI evaluation dashboard."
+      ],
+      "data": "KnowledgeArticleVersion, Conversation, AssistantMessage, AIEvaluationCase, AIEvaluationRun. Provider adapter: real LLM or deterministic labelled simulator.",
+      "flow": "Authenticate→retrieve authorized facts/FAQ→generate or simulate grounded answer→validate output→show sources→navigate to relevant page; voice feeds the same pipeline.",
+      "rules": "Read-only tools only; policy checks before retrieval; no arbitrary queries, hidden exam papers or staff notes. Redact unnecessary PII. Browser speech fallback is mandatory. Simulated mode is visibly labelled; real model key stays server-side.",
+      "accept": "At least 30 evaluation questions cover sources, false premise, unauthorized student, prompt injection, timeout, Hindi/English and unavailable data. Facts must match DB. No voice permission means typed flow remains usable.",
+      "demo": "Ask fee balance, next class, hostel status and certificate status; ask for another student's data and show refusal.",
+      "key": "assistant",
+      "routes": [
+        "/app/assistant/chat",
+        "/app/assistant/history",
+        "/app/assistant/voice",
+        "/app/assistant/evaluation"
+      ]
+    },
+    {
+      "id": "32",
+      "name": "Performance prediction and early-support analytics",
+      "origin": "Challenge AI",
+      "deps": [
+        "08",
+        "14",
+        "15"
+      ],
+      "pages": [
+        "Prediction dashboard with cohort filter and data/model version.",
+        "Individual support profile with score, drivers, uncertainty and history.",
+        "Synthetic training/evaluation console and threshold scenario comparison.",
+        "Advisor review, outreach task and outcome tracking."
+      ],
+      "data": "SyntheticDatasetVersion, FeatureSnapshot, ModelVersion, Prediction, EvaluationReport, AdvisorReview, SupportIntervention.",
+      "flow": "Generate labelled synthetic longitudinal data→split/train baseline→evaluate→version model→score authorized cohort→advisor reviews→creates support task→tracks outcome.",
+      "rules": "Actually compute numeric performance regression and dropout-risk logistic baseline in Node/TypeScript or documented Node-compatible runtime. Use student-separated temporal holdout and pre-cutoff features. Synthetic labels demonstrate pipeline only. No claim of real predictive validity; no automated penalties. No sensitive demographic features.",
+      "accept": "Seeded training reproducible; holdout never enters fitting/preprocessing; regression MAE and classification precision/recall/PR-AUC/calibration actually computed with class balance; changing input changes score; low-data conditions shown.",
+      "demo": "Train the synthetic baseline, inspect held-out metrics, compare two scenarios and create a human-reviewed support task.",
+      "key": "predictions",
+      "routes": [
+        "/app/predictions/dashboard",
+        "/app/predictions/student-support",
+        "/app/predictions/training",
+        "/app/predictions/interventions"
+      ]
+    },
+    {
+      "id": "33",
+      "name": "Personalized learning recommendations",
+      "origin": "Challenge AI",
+      "deps": [
+        "05",
+        "14",
+        "31",
+        "32"
+      ],
+      "pages": [
+        "Student learning dashboard, topic mastery and suggested resources.",
+        "Resource catalog/editor tagged by topic, difficulty, language and format.",
+        "Personal learning plan, progress/completion and feedback.",
+        "Faculty recommendation review and aggregate engagement."
+      ],
+      "data": "Topic, Resource, TopicAssessmentMapping, MasterySnapshot, Recommendation, LearningPlan, LearningActivity.",
+      "flow": "Map assessment to topics→compute mastery→rank curated resources→explain recommendation→student completes activity→update plan.",
+      "rules": "Provide working explainable rule-based ranking, clearly described as such, with optional LLM explanations grounded in catalog facts. Never invent external resources or infer mastery from unrelated grades. Manual override and student preference controls.",
+      "accept": "Low mastery changes ranked resources; prerequisites and language preference respected; completion persists; no data returns starter plan, not fabricated personalized insight.",
+      "demo": "Show a weak topic, recommended resource and progress after completing a seeded activity.",
+      "key": "learning",
+      "routes": [
+        "/app/learning/my-plan",
+        "/app/learning/resources",
+        "/app/learning/progress",
+        "/app/learning/faculty"
+      ]
+    },
+    {
+      "id": "34",
+      "name": "Mobile app and offline-safe access",
+      "origin": "Challenge",
+      "deps": [
+        "07",
+        "08",
+        "09",
+        "10",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "31",
+        "33"
+      ],
+      "pages": [
+        "Complete responsive student/guardian navigation on phone.",
+        "Install/update/offline indicators and download states.",
+        "Native Android app shell with deep links and permission screens.",
+        "Settings: language, notifications, privacy, logout and local-data clearing."
+      ],
+      "data": "DeviceRegistration, NotificationPreference; explicit storage/cache policy and Capacitor configuration.",
+      "flow": "Use responsive web→install PWA→package Android app→authenticate→use student journeys→logout and clear private state.",
+      "rules": "Full prototype includes a tested Android debug APK via Capacitor, not only a PWA. Cache public/static assets only by default; offline private writes disabled with clear UI. Verify actual device authentication without disabling CSRF/browser protections. No claim of iOS build unless tested.",
+      "accept": "Android build installs on emulator/device; login, timetable, ticket, payment simulation, PDF download and voice fallback work; deep links enforce auth; logout clears private local state; offline screen honest.",
+      "demo": "Run student certificate/helpdesk journey on Android and show safe offline state.",
+      "key": "mobile",
+      "routes": [
+        "/app/mobile/home",
+        "/app/mobile/install",
+        "/app/mobile/android",
+        "/app/mobile/settings"
+      ]
+    },
+    {
+      "id": "35",
+      "name": "Demo control center, integrations and operations",
+      "origin": "Prototype infrastructure",
+      "deps": [
+        "10",
+        "17",
+        "22",
+        "31",
+        "32"
+      ],
+      "pages": [
+        "Restricted demo control center: scenario catalog and reset/seed status.",
+        "Integration mode/health dashboard, simulator event history and retry.",
+        "Background job status, audit/search, storage usage and backup/restore guide.",
+        "Scenario time controls with prominent simulated-clock indicator."
+      ],
+      "data": "DemoScenario, SimulationEvent, IntegrationConfiguration, JobRun, SeedManifest, DemoClock.",
+      "flow": "Select seeded scenario→run labelled provider event→inspect domain outcome→reset isolated demo dataset through protected command/control→verify integrity.",
+      "rules": "Modes are explicit per adapter. Simulator commands never bypass domain services or fabricate success. Reset limited to a dedicated disposable demo environment with confirmation and protected staff role; default reset remains CLI. Never reset user/pilot databases.",
+      "accept": "Non-demo environment refuses reset/simulator mutation; failed event remains failed; replay remains idempotent; all simulator events marked in audit; seed validation reports missing references.",
+      "demo": "Trigger delayed payment callback and notification failure, then demonstrate recovery.",
+      "key": "demo-operations",
+      "routes": [
+        "/app/demo-operations/scenarios",
+        "/app/demo-operations/integrations",
+        "/app/demo-operations/jobs",
+        "/app/demo-operations/clock"
+      ]
+    },
+    {
+      "id": "36",
+      "name": "Complete UI audit, end-to-end rehearsal and release",
+      "origin": "Whole-product completion",
+      "deps": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34",
+        "35"
+      ],
+      "pages": [
+        "All page inventory entries must be reachable by the correct persona.",
+        "Reviewer guide, demo scenario index and feature/integration disclosure page.",
+        "Complete English/Hindi primary navigation and accessible state coverage."
+      ],
+      "data": "Route coverage report, action coverage report, test evidence, release manifest and verified artifact links.",
+      "flow": "Run clean setup→seed→API/security tests→browser journeys→Android checks→deployed rehearsal→record module walkthroughs→prepare submission package.",
+      "rules": "No page may remain 'coming soon'. Every visible action must persist, compute, download, navigate or clearly validate. Integration simulation is allowed but must exercise real domain logic. Never silently downgrade to read-only mock screens.",
+      "accept": "Every module acceptance gate passes or is explicitly listed as a release blocker; all cross-module demo journeys pass; all routes/actions mapped to evidence; clean install reproducible; screenshots/recordings show actual app.",
+      "demo": "Present the complete storyline plus short module-specific recordings indexed by module ID.",
+      "key": "release",
+      "routes": [
+        "/app/release/coverage",
+        "/app/release/reviewer-guide",
+        "/app/release/accessibility"
+      ]
+    }
+  ]
+}
