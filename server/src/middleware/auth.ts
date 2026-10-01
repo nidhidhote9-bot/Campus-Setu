@@ -42,7 +42,15 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
 
 export function validateCSRF(req: AuthRequest, res: Response, next: NextFunction) {
   // Safe HTTP methods or public auth/admissions endpoints do not require CSRF token check
-  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method) || req.path.startsWith('/auth/login') || req.path.startsWith('/auth/register') || req.path.startsWith('/admissions/apply') || req.path.includes('/correct')) {
+  if (
+    ['GET', 'HEAD', 'OPTIONS'].includes(req.method) ||
+    req.path.startsWith('/auth/login') ||
+    req.path.startsWith('/auth/register') ||
+    req.path.startsWith('/admissions/apply') ||
+    req.path.includes('/correct') ||
+    req.path.includes('/mobile/deep-links/validate') ||
+    req.path.includes('/mobile/offline/attempt-write')
+  ) {
     return next();
   }
 

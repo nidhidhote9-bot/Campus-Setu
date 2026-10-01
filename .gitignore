@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production / Build outputs
+dist/
+build/
+client/dist/
+server/dist/
+
+# Logs & test results
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vite/
+coverage/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Android build cache (preserve source)
+android/.gradle/
+android/app/build/
+android/build/
+android/captures/
+android/.idea/
+android/*.iml
+android/local.properties

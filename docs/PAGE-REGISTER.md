@@ -55,4 +55,43 @@
 | Exam Operations Centers | `/app/exam-operations/centers` | Admin, SuperAdmin | Center and room verification, live capacity matrix, seating allocation, audited reallocation | Active |
 | Exam Operations Invigilators | `/app/exam-operations/invigilators` | Admin, Faculty | Invigilator duty roster, appointment modal, duty acknowledgement, absent tracking | Active |
 | Exam Operations Materials | `/app/exam-operations/materials` | Admin, SuperAdmin | Answer-book stock, non-overlapping serial ranges, dispatch under seal, reconciliation | Active |
+| Assessment Marks Grid | `/app/assessment/marks` | Faculty, Admin | Faculty assessment roster, component-wise grid, explicit absent/withheld states | Active |
+| Bulk CSV Marks Import | `/app/assessment/imports` | Faculty, Admin | CSV marks upload, term verification check, out-of-range rejection & row error summary | Active |
+| Assessment Moderation | `/app/assessment/moderation` | Admin, Moderator | Moderator review queue, discrepancy inspection, approve/return workflow & comments | Active |
+| Student Published Scores | `/app/assessment/my-assessments` | Student | Published component assessment breakdown; unpublished draft/moderation scores hidden | Active |
+| Results Tabulation & Approval | `/app/results/tabulation` | Admin, SuperAdmin | Tabulation grid preview, grade scale check, pass/backlog status, board approval queue | Active |
+| Results Publication & Revisions | `/app/results/publication` | Admin, SuperAdmin | Idempotent publication dashboard, revision comparison (v1 vs v2 superseding revision) | Active |
+| Student Term Results & Grade Cards | `/app/results/my-results` | Student | Term grade card, SGPA/CGPA radar, digital transcript download, privacy shield | Active |
+| Results Reports & Pass Lists | `/app/results/reports` | Admin, Faculty | Pass list, withheld list, pass percentage analytics, CSV/PDF report export | Active |
+| Revaluation & Retotalling Apply | `/app/revaluation/apply` | Student | Eligible published paper list, retotalling/revaluation request form, fee status & payment simulator | Active |
+| Revaluation Assignments Queue | `/app/revaluation/assignments` | Admin, SuperAdmin | Exam office request queue, reviewer/evaluator assignment form, deadline tracking matrix | Active |
+| Revaluation Outcome Entry | `/app/revaluation/outcomes` | Faculty, Admin | Evaluator score change entry, exam office outcome approval & superseding v2 revision creation | Active |
+| Student Revaluation Decisions | `/app/revaluation/my-decisions` | Student | Official decision notice board, before/after score comparison table & fee refund status | Active |
+| Certificate Catalog & Request | `/app/certificates/catalog` | Student, All Roles | Certificate catalog, no-dues eligibility checklist, request form & fee tracking | Active |
+| Staff Certificate Review Queue | `/app/certificates/review` | Staff, Admin | Staff review queue, template preview, approval & cryptographic snapshot issuance | Active |
+| My Issued Certificates | `/app/certificates/my-certificates` | Student | My certificates list, private authenticated download, sharing link & revocation notice | Active |
+| Public QR Verification Portal | `/app/certificates/verify`, `/certificates/verify` | Public | Unauthenticated QR verification portal, minimal fact disclosure & revocation status | Active |
+| AI Assistant Chat & Context Drawer | `/app/assistant/chat` | All Roles | Grounded AI Chat Assistant, contextual drawer, verified source citations, linked record navigation | Active |
+| AI Conversation History | `/app/assistant/history` | All Roles | Conversation history controls, source cards inspect, linked records and resumption | Active |
+| AI Assistant Voice Gateway | `/app/assistant/voice` | All Roles | Speech input/output controls, live audio wave animation, transcript and microphone error fallback | Active |
+| AI Knowledge & Evaluation Admin | `/app/assistant/evaluation` | Admin, SuperAdmin | Knowledge article versioning, 32-case AI evaluation suite runner, category breakdown & pass rate | Active |
+| Prediction Cohort Dashboard | `/app/predictions/dashboard` | Admin, Faculty, Staff | Cohort prediction dashboard, risk distribution, department filters & active model version badge | Active |
+| Student Support Profile & Simulator | `/app/predictions/student-support` | Faculty, Advisor, Admin | Individual support profile, predicted SGPA confidence interval, risk gauge, explainable drivers & What-If sensitivity simulator | Active |
+| Synthetic Training & Evaluation Console | `/app/predictions/training` | Admin, SuperAdmin | Seeded synthetic dataset generator, holdout evaluation metrics (MAE, R², PR-AUC, Brier), 5-bin calibration curve & threshold scenario comparison (0.35 vs 0.50 vs 0.65) | Active |
+| Advisor Reviews & Support Interventions | `/app/predictions/interventions` | Faculty, Advisor, Admin | Human review queue, qualitative rationale logging, peer tutoring/counseling task assignment & outcome tracking | Active |
+| Student Learning Dashboard & My Plan | `/app/learning/my-plan` | Student, Admin | Student personalized learning dashboard, radar concept mastery, explainable ranked recommendations, learning preferences modal & cold-start notice | Active |
+| Curated Resource Catalog | `/app/learning/resources` | All Roles | Verified multilingual internal learning resources catalog, topic/difficulty/format/language filters & new resource submission modal | Active |
+| Personal Progress & Activity Timeline | `/app/learning/progress` | Student, All Roles | Student study hour progress, completion metrics, activity logger modal with score/ratings & interactive completion timeline | Active |
+| Faculty Recommendations & Cohort Analytics | `/app/learning/faculty` | Faculty, Admin | Faculty cohort topic mastery heatmap, weakest topic identifier alert, individual student plans inspect & resource endorsement modal | Active |
+| Mobile Navigation & Student Home | `/app/mobile/home` | Student, Guardian, All Roles | Complete responsive mobile navigation on phone shell (390px), quick action drawer, academic schedule, dues & hall ticket previews | Active |
+| Mobile PWA Install & Offline Portal | `/app/mobile/install` | All Roles | PWA installation state, standalone indicator, Service Worker cache inspector & offline storage safety policy | Active |
+| Android App Shell & Deep Link Console | `/app/mobile/android` | All Roles, Admin | Native Android Capacitor shell, debug APK download, permissions roster, live deep link tester & CSRF-safe auth check | Active |
+| Mobile Settings & Local Data Purge | `/app/mobile/settings` | All Roles | Mobile notification toggles, language switcher (English/Hindi), biometric toggle, registered devices list & local private state wipe | Active |
+| Demo Scenarios & Isolated Reset | `/app/demo-operations/scenarios` | Admin, SuperAdmin | Scenario catalog, scenario activation/preparation, seed manifest checksum validator & confirmation-phrase guarded destructive reset | Active |
+| Integration Adapters & Simulator | `/app/demo-operations/integrations` | Admin, SuperAdmin | Integration mode switcher (MOCK, SIMULATED, SANDBOX, LIVE), failure injection modal, simulation event history & idempotent replay | Active |
+| Background Job Telemetry & Storage Runbook | `/app/demo-operations/jobs` | Admin, SuperAdmin | Background job runner, execution telemetry, database storage statistics & mongodump/mongorestore backup runbook | Active |
+| Virtual Scenario Clock & Demonstration | `/app/demo-operations/clock` | Admin, SuperAdmin | Scenario virtual clock controls (time offsets & scaling), sticky simulator indicator & reproducible delayed-payment recovery runner | Active |
+| Route Coverage & Zero 'Coming Soon' | `/app/release/coverage` | Admin, SuperAdmin | Complete route and action coverage inventory, persona reachability matrix, live deep link tester & zero placeholder invariant validator | Active |
+| Reviewer Guide & Demo Scenarios | `/app/release/reviewer-guide` | All Roles, Evaluators | Seed credentials cheat-sheet, 7 golden-path storyline workflows, 7 scenario preparers, verified SHA-256 artifacts & submission package generator | Active |
+| Accessibility & Bilingual Radar | `/app/release/accessibility` | All Roles | WCAG 2.1 AA compliance radar, color contrast telemetry, screen reader labels, 100% English/Hindi dictionary parity & 4 responsive viewports | Active |
 

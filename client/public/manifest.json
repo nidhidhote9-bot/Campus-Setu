@@ -1,0 +1,23 @@
+{
+  "short_name": "CampusSetu",
+  "name": "CampusSetu Higher Education Mobile",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/app/mobile/home",
+  "background_color": "#0f172a",
+  "theme_color": "#4f46e5",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "description": "Offline-safe mobile student and guardian portal for CampusSetu ERP"
+}

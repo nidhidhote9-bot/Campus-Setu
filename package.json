@@ -24,6 +24,7 @@
   "author": "CampusSetu Team",
   "license": "MIT",
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
@@ -46,6 +47,8 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

@@ -1,0 +1,23 @@
+{
+  "appId": "org.campussetu.app",
+  "appName": "CampusSetu Mobile",
+  "webDir": "client/dist",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false,
+    "hostname": "campussetu.edu"
+  },
+  "android": {
+    "buildOptions": {
+      "releaseType": "APK"
+    }
+  },
+  "plugins": {
+    "DeepLinks": {
+      "customUrlScheme": "campussetu"
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
+}
