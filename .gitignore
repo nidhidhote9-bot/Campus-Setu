@@ -44,3 +44,7 @@ android/captures/
 android/.idea/
 android/*.iml
 android/local.properties
+
+# Prompt files
+04-ANTIGRAVITY-PROMPTS.md
+
