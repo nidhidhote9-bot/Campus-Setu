@@ -16,8 +16,9 @@ app.use(cors({
   credentials: true
 }));
 
-// API Routes
+// API Routes (supports both /api/v1 and /api)
 app.use('/api/v1', apiRoutes);
+app.use('/api', apiRoutes);
 
 // Serve client static build in production mode if exists
 const clientDistPath = path.join(__dirname, '../../client/dist');

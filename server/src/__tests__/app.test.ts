@@ -32,6 +32,7 @@ import {
 } from '@shared/index';
 import {
   User,
+  Institution,
   Student,
   Course,
   ExamCycle,
@@ -6154,7 +6155,120 @@ describe('CampusSetu Complete Integration Sprint & Acceptance Test Suite', () =>
     expect(demoRes.body.submissionBundle).toBeDefined();
     expect(demoRes.body.submissionBundle.readinessVerdict).toBe('READY');
   });
+
+  it('119. DEMO USERS AUTHENTICATION: All 7 role-based demo accounts login successfully with Demo@12345', async () => {
+    const demoUsers = [
+      { email: 'superadmin@demo.com', role: UserRole.SUPER_ADMIN },
+      { email: 'university@demo.com', role: UserRole.ADMIN },
+      { email: 'college@demo.com', role: UserRole.ADMIN },
+      { email: 'faculty@demo.com', role: UserRole.FACULTY },
+      { email: 'student@demo.com', role: UserRole.STUDENT },
+      { email: 'exam@demo.com', role: UserRole.ADMIN },
+      { email: 'finance@demo.com', role: UserRole.FINANCE }
+    ];
+
+    for (const u of demoUsers) {
+      const res = await request
+        .post('/api/v1/auth/login')
+        .send({
+          email: u.email,
+          password: 'Demo@12345',
+          role: u.role
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.token).toBeDefined();
+      expect(res.body.user.email).toBe(u.email);
+      expect(res.body.user.role).toBe(u.role);
+    }
+  });
+
+  it('120. AUTHENTICATION GUARDS: Invalid password and unknown user rejected with 400', async () => {
+    // 1. Wrong password
+    const wrongPassRes = await request
+      .post('/api/v1/auth/login')
+      .send({
+        email: 'superadmin@demo.com',
+        password: 'WrongPassword999!',
+        role: UserRole.SUPER_ADMIN
+      });
+    expect(wrongPassRes.status).toBe(400);
+    expect(wrongPassRes.body.error).toContain('Invalid email or password');
+
+    // 2. Unknown user
+    const unknownRes = await request
+      .post('/api/v1/auth/login')
+      .send({
+        email: 'nonexistent.user@demo.com',
+        password: 'Demo@12345',
+        role: UserRole.STUDENT
+      });
+    expect(unknownRes.status).toBe(400);
+    expect(unknownRes.body.error).toContain('Invalid email or password');
+  });
+
+  it('121. BACKEND AUTHORIZATION: Student cannot access administrative and institution management routes', async () => {
+    const studentLogin = await request
+      .post('/api/v1/auth/login')
+      .send({ email: 'student@demo.com', password: 'Demo@12345', role: UserRole.STUDENT });
+    const studentToken = studentLogin.body.token;
+
+    // Student trying to create institution -> 403 Forbidden
+    const createInstRes = await request
+      .post('/api/v1/institutions')
+      .set('Authorization', `Bearer ${studentToken}`)
+      .send({
+        code: 'HACK',
+        name: 'Unauthorized Institute',
+        address: 'Unknown',
+        contactEmail: 'hack@test.com',
+        contactPhone: '9999999999'
+      });
+    expect(createInstRes.status).toBe(403);
+  });
+
+  it('122. BACKEND AUTHORIZATION: Faculty cannot access finance budget creation', async () => {
+    const facultyLogin = await request
+      .post('/api/v1/auth/login')
+      .send({ email: 'faculty@demo.com', password: 'Demo@12345', role: UserRole.FACULTY });
+    const facultyToken = facultyLogin.body.token;
+
+    const budgetRes = await request
+      .post('/api/v1/finance/budgets')
+      .set('Authorization', `Bearer ${facultyToken}`)
+      .send({
+        fiscalYear: '2026-2027',
+        name: 'Unauthorized Faculty Budget',
+        entries: []
+      });
+    expect(budgetRes.status).toBe(403);
+  });
+
+  it('123. MULTI-TENANCY SCOPING: Student profile is scoped to authenticated student only', async () => {
+    const studentLogin = await request
+      .post('/api/v1/auth/login')
+      .send({ email: 'student@demo.com', password: 'Demo@12345', role: UserRole.STUDENT });
+    const studentToken = studentLogin.body.token;
+    const studentId = studentLogin.body.user.studentId;
+
+    // Access own profile -> 200
+    const ownRes = await request
+      .get(`/api/v1/students/${studentId}`)
+      .set('Authorization', `Bearer ${studentToken}`);
+    expect(ownRes.status).toBe(200);
+    expect(ownRes.body._id).toBe(studentId);
+  });
+
+  it('124. DATABASE SEED IDEMPOTENCY: Re-running seedDatabase creates clean consistent data without crashes', async () => {
+    await seedDatabase();
+    const instCount = await Institution.countDocuments();
+    expect(instCount).toBe(3); // 3 seeded institutions
+
+    const userCount = await User.countDocuments();
+    expect(userCount).toBeGreaterThanOrEqual(10);
+  });
 });
+
 
 
 

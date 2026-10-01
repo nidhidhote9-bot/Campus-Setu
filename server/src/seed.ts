@@ -461,13 +461,29 @@ export async function seedDatabase() {
     VerifiedArtifactLink.deleteMany({})
   ]);
 
-  console.log('[Seed] Creating Institution & Departments...');
+  console.log('[Seed] Creating Institutions & Departments (Multi-Tenant Hierarchy)...');
   const inst = await Institution.create({
     code: 'DITS',
     name: 'Delhi Institute of Technology & Science',
     address: 'Sector 16, Knowledge Park, New Delhi',
     contactEmail: 'contact@dits.edu.in',
     contactPhone: '+91 11 2890 4321'
+  });
+
+  const instMiet = await Institution.create({
+    code: 'MIET',
+    name: 'Mumbai Institute of Engineering & Technology',
+    address: 'Powai Valley Campus, Mumbai',
+    contactEmail: 'contact@miet.ac.in',
+    contactPhone: '+91 22 2576 8900'
+  });
+
+  const instBiat = await Institution.create({
+    code: 'BIAT',
+    name: 'Bangalore Institute of Applied Technology',
+    address: 'Electronic City Phase 1, Bangalore',
+    contactEmail: 'info@biat.edu.in',
+    contactPhone: '+91 80 4120 7700'
   });
 
   const depCse = await Department.create({
@@ -480,6 +496,36 @@ export async function seedDatabase() {
     institutionId: inst._id,
     code: 'ECE',
     name: 'Electronics & Communication'
+  });
+
+  const depMech = await Department.create({
+    institutionId: inst._id,
+    code: 'MECH',
+    name: 'Mechanical Engineering'
+  });
+
+  const depCivil = await Department.create({
+    institutionId: inst._id,
+    code: 'CIVIL',
+    name: 'Civil Engineering'
+  });
+
+  const depMietAids = await Department.create({
+    institutionId: instMiet._id,
+    code: 'AIDS',
+    name: 'Artificial Intelligence & Data Science'
+  });
+
+  const depMietMgmt = await Department.create({
+    institutionId: instMiet._id,
+    code: 'MGMT',
+    name: 'Management Studies'
+  });
+
+  const depBiatCse = await Department.create({
+    institutionId: instBiat._id,
+    code: 'CSE',
+    name: 'Computer Science & Engineering'
   });
 
   console.log('[Seed] Creating External Code Mappings for Admissions...');
@@ -497,36 +543,72 @@ export async function seedDatabase() {
     mappedProgramCode: 'BTECH_ECE'
   });
 
+  // Dual hashed passwords for seamless login with Demo@12345 or Password123!
   const passwordHash = await bcrypt.hash('Password123!', 10);
+  const demoPasswordHash = await bcrypt.hash('Demo@12345', 10);
 
-  console.log('[Seed] Creating System Accounts for All Roles...');
+  console.log('[Seed] Creating System Accounts for All Standard & Demo Roles...');
 
+  // 1. Super Admin
   const superAdmin = await User.create({
     email: 'superadmin@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Dr. Vikramaditya (Super Admin)',
     role: UserRole.SUPER_ADMIN
   });
 
+  await User.create({
+    email: 'superadmin@demo.com',
+    passwordHash: demoPasswordHash,
+    name: 'Dr. Vikramaditya (Super Admin)',
+    role: UserRole.SUPER_ADMIN
+  });
+
+  // 2. University / Campus Admin
   const admin = await User.create({
     email: 'admin@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Suresh Menon (Campus Admin)',
     role: UserRole.ADMIN,
     institutionId: inst._id
   });
 
+  await User.create({
+    email: 'university@demo.com',
+    passwordHash: demoPasswordHash,
+    name: 'Dr. Anita Deshmukh (University Admin)',
+    role: UserRole.ADMIN,
+    institutionId: inst._id
+  });
+
+  await User.create({
+    email: 'college@demo.com',
+    passwordHash: demoPasswordHash,
+    name: 'Suresh Menon (College Admin)',
+    role: UserRole.ADMIN,
+    institutionId: inst._id
+  });
+
+  // 3. Faculty
   const facultyCse = await User.create({
     email: 'faculty.cse@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Prof. Rajesh Sharma (HOD CSE)',
+    role: UserRole.FACULTY,
+    institutionId: inst._id
+  });
+
+  await User.create({
+    email: 'faculty@demo.com',
+    passwordHash: demoPasswordHash,
+    name: 'Prof. Rajesh Sharma (Faculty)',
     role: UserRole.FACULTY,
     institutionId: inst._id
   });
 
   const facultyEce = await User.create({
     email: 'faculty.ece@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Dr. Priya Sharma (Associate Prof ECE)',
     role: UserRole.FACULTY,
     institutionId: inst._id
@@ -537,17 +619,36 @@ export async function seedDatabase() {
   await depCse.save();
   await depEce.save();
 
+  // 4. Exam Officer (Controller of Examinations)
+  await User.create({
+    email: 'exam@demo.com',
+    passwordHash: demoPasswordHash,
+    name: 'Dr. Ramesh Kulkarni (Exam Officer)',
+    role: UserRole.ADMIN,
+    institutionId: inst._id
+  });
+
+  // 5. Finance Head / Officer
   const financeUser = await User.create({
     email: 'finance@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Priya Verma (Finance Head)',
     role: UserRole.FINANCE,
     institutionId: inst._id
   });
 
+  await User.create({
+    email: 'finance@demo.com',
+    passwordHash: demoPasswordHash,
+    name: 'Priya Verma (Finance Officer)',
+    role: UserRole.FINANCE,
+    institutionId: inst._id
+  });
+
+  // 6. Warden & Placement Officers
   const wardenUser = await User.create({
     email: 'warden@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Rameshwar Singh (Hostel Warden)',
     role: UserRole.WARDEN,
     institutionId: inst._id
@@ -555,16 +656,16 @@ export async function seedDatabase() {
 
   const placementUser = await User.create({
     email: 'placement@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Anita Kapoor (Placement Director)',
     role: UserRole.PLACEMENT_OFFICER,
     institutionId: inst._id
   });
 
-  // Students & Guardians
+  // 7. Students & Guardians
   const guardianUser = await User.create({
     email: 'guardian.sharma@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Mr. Ramesh Sharma (Parent)',
     role: UserRole.GUARDIAN,
     institutionId: inst._id,
@@ -573,15 +674,23 @@ export async function seedDatabase() {
 
   const studentUser1 = await User.create({
     email: 'student.aarav@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Aarav Sharma',
+    role: UserRole.STUDENT,
+    institutionId: inst._id
+  });
+
+  const demoStudentUser = await User.create({
+    email: 'student@demo.com',
+    passwordHash: demoPasswordHash,
+    name: 'Aarav Sharma (Demo Student)',
     role: UserRole.STUDENT,
     institutionId: inst._id
   });
 
   const studentUser2 = await User.create({
     email: 'student.ananya@campussetu.edu',
-    passwordHash,
+    passwordHash: demoPasswordHash,
     name: 'Ananya Patel',
     role: UserRole.STUDENT,
     institutionId: inst._id
@@ -593,6 +702,18 @@ export async function seedDatabase() {
     departmentId: depCse._id,
     rollNumber: 'CSE-2024-001',
     enrollmentNumber: 'ENR2024001',
+    currentSemester: 4,
+    batchYear: 2024,
+    guardianUserId: guardianUser._id,
+    cgpa: 8.8
+  });
+
+  await Student.create({
+    userId: demoStudentUser._id,
+    institutionId: inst._id,
+    departmentId: depCse._id,
+    rollNumber: 'CSE-DEMO-001',
+    enrollmentNumber: 'ENRDEMO001',
     currentSemester: 4,
     batchYear: 2024,
     guardianUserId: guardianUser._id,

@@ -11,27 +11,33 @@ export const LoginPage: React.FC = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('superadmin@campussetu.edu');
-  const [password, setPassword] = useState('Password123!');
+  const [email, setEmail] = useState('superadmin@demo.com');
+  const [password, setPassword] = useState('Demo@12345');
   const [role, setRole] = useState<UserRole>(UserRole.SUPER_ADMIN);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const rolesList = [
-    { value: UserRole.SUPER_ADMIN, label: 'Super Admin', defaultEmail: 'superadmin@campussetu.edu' },
-    { value: UserRole.ADMIN, label: 'Campus Admin', defaultEmail: 'admin@campussetu.edu' },
-    { value: UserRole.FACULTY, label: 'Faculty (Prof. Sharma)', defaultEmail: 'faculty.cse@campussetu.edu' },
-    { value: UserRole.STUDENT, label: 'Student (Aarav Sharma)', defaultEmail: 'student.aarav@campussetu.edu' },
-    { value: UserRole.GUARDIAN, label: 'Guardian (Parent)', defaultEmail: 'guardian.sharma@campussetu.edu' },
-    { value: UserRole.FINANCE, label: 'Finance Head', defaultEmail: 'finance@campussetu.edu' },
+    { value: UserRole.SUPER_ADMIN, label: 'Super Admin (superadmin@demo.com)', defaultEmail: 'superadmin@demo.com' },
+    { value: UserRole.ADMIN, label: 'University Admin (university@demo.com)', defaultEmail: 'university@demo.com' },
+    { value: UserRole.ADMIN, label: 'College Admin (college@demo.com)', defaultEmail: 'college@demo.com' },
+    { value: UserRole.FACULTY, label: 'Faculty (faculty@demo.com)', defaultEmail: 'faculty@demo.com' },
+    { value: UserRole.STUDENT, label: 'Student (student@demo.com)', defaultEmail: 'student@demo.com' },
+    { value: UserRole.ADMIN, label: 'Exam Officer (exam@demo.com)', defaultEmail: 'exam@demo.com' },
+    { value: UserRole.FINANCE, label: 'Finance Officer (finance@demo.com)', defaultEmail: 'finance@demo.com' },
+    { value: UserRole.GUARDIAN, label: 'Parent / Guardian', defaultEmail: 'guardian.sharma@campussetu.edu' },
     { value: UserRole.WARDEN, label: 'Hostel Warden', defaultEmail: 'warden@campussetu.edu' },
     { value: UserRole.PLACEMENT_OFFICER, label: 'Placement Officer', defaultEmail: 'placement@campussetu.edu' }
   ];
 
-  const handleRoleSelect = (selectedRole: UserRole) => {
+  const handleRoleSelect = (selectedRole: UserRole, defaultEmail?: string) => {
     setRole(selectedRole);
-    const item = rolesList.find(r => r.value === selectedRole);
-    if (item) setEmail(item.defaultEmail);
+    if (defaultEmail) {
+      setEmail(defaultEmail);
+    } else {
+      const item = rolesList.find(r => r.value === selectedRole);
+      if (item) setEmail(item.defaultEmail);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

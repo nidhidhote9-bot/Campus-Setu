@@ -340,7 +340,7 @@ export const RegisterSchema = z.object({
 export const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
-  role: z.nativeEnum(UserRole)
+  role: z.nativeEnum(UserRole).optional()
 });
 
 export const InstitutionSchema = z.object({
